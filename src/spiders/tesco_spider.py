@@ -1,7 +1,7 @@
 import scrapy
 
 class TescoSpider(scrapy.Spider):
-    name = "quotes"
+    name = "tesco"
 
     def start_requests(self):
         urls = [
