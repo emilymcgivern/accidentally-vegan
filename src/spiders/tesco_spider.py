@@ -14,7 +14,7 @@ class TescoSpider(scrapy.Spider):
     def parse(self, response):
         soup = BeautifulSoup(response.text, 'html.parser')
         i = 1
-        while i < 11:
+        while i < 6:
             results = soup.find(id='nav-' + str(i))
             yield scrapy.Request(url=results.a.get('href'), callback=self.getDepartments)
             i += 1
@@ -31,15 +31,14 @@ class TescoSpider(scrapy.Spider):
         results = soup.find("h3", class_="inBasketInfoContainer")
         results2 = results.find_all("a")
         for entry in results2:
-            # self.log(entry.find("a"))
-            # self.log(entry.get("href"))
             yield scrapy.Request(url='https://www.tesco.ie/' + entry.get('href'), callback=self.getIndividualItemDetails)
     
     def getIndividualItemDetails(self, response):
         soup = BeautifulSoup(response.body, 'html.parser')
-        results = soup.find("div", class_="productDetails")
-        # results = soup.find("div", class_="productDetailsContainer")
-        itemName = results.find("h1")
-        self.log(itemName)
-        # soup = BeautifulSoup(response.body, 'html.parser')
-        # self.log(soup.find("productDetailsContainer"))
+        results = soup.find("div", class_="detailsBox")
+        isVegan = results.find_all(text="Suitable for Vegans")
+        if (len(isVegan) > 0):
+            itemHeader = soup.find("div", class_="productDetails")
+            itemName = itemHeader.find("h1")
+            with open('vegan.txt', 'a') as f:
+                f.write(itemName.text + '\n')
