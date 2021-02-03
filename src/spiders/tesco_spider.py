@@ -1,3 +1,4 @@
+import re
 import scrapy
 from bs4 import BeautifulSoup
 
@@ -22,15 +23,15 @@ class TescoSpider(scrapy.Spider):
     def getDepartments(self, response):
         soup = BeautifulSoup(response.body, 'html.parser')
         results = soup.find("div", class_="tertNavContent")
-        results2 = results.find_all("a")
-        for entry in results2:
+        departmentUrl = results.find_all("a")
+        for entry in departmentUrl:
             yield scrapy.Request(url=entry.get('href'), callback=self.getItems)
 
     def getItems(self, response):
         soup = BeautifulSoup(response.body, 'html.parser')
         results = soup.find("h3", class_="inBasketInfoContainer")
-        results2 = results.find_all("a")
-        for entry in results2:
+        itemUrl = results.find_all("a")
+        for entry in itemUrl:
             yield scrapy.Request(url='https://www.tesco.ie/' + entry.get('href'), callback=self.getIndividualItemDetails)
     
     def getIndividualItemDetails(self, response):
