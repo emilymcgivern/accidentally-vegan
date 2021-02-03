@@ -6,7 +6,7 @@ class TescoSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = [
-            'https://www.tesco.ie/groceries/' #fresh food
+            'https://www.tesco.ie/groceries' #fresh food
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
@@ -36,9 +36,9 @@ class TescoSpider(scrapy.Spider):
     def getIndividualItemDetails(self, response):
         soup = BeautifulSoup(response.body, 'html.parser')
         results = soup.find("div", class_="detailsBox")
-        isVegan = results.find_all(text="Suitable for Vegans")
+        isVegan = results.find_all(text=re.compile("Suitable for Vegans"))
         if (len(isVegan) > 0):
             itemHeader = soup.find("div", class_="productDetails")
             itemName = itemHeader.find("h1")
             with open('vegan.txt', 'a') as f:
-                f.write(itemName.text + '\n')
+                f.write(itemName.text + ' ' + response.url + '\n')
